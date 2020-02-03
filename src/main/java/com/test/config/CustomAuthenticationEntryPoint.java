@@ -9,9 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Returns a 401 error code (Unauthorized) to the client.
- */
+
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
