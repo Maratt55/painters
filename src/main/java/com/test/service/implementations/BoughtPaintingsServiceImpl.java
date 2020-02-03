@@ -21,6 +21,7 @@ import java.util.Date;
 @Service
 public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
 
+
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(BoughtPaintingsServiceImpl.class);
 
     @Autowired
