@@ -17,7 +17,7 @@ public interface UserService {
 
     Page<User> getAll(Pageable pageable);
 
-    void register(User user);
+    void register(User user) throws NotFoundException;
 
     void verify(String email, String verification);
 
@@ -28,6 +28,4 @@ public interface UserService {
     void resetPassword(String email, String resetPasswordCode, String newPassword);
 
     void endPoint(String email);
-
-    void buyPainting();
 }

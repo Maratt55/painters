@@ -20,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.*;
 import java.util.List;
 
+
 @Service
 public class PainterServiceImpl implements PainterService {
+
 
     public static final long CURRENTY_FOR_HOURS = 12 * 60 * 60 * 1000;
 

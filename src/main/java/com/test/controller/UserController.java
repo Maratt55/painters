@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/register")
-    public ResponseEntity register(@Valid @RequestBody User user) {
+    public ResponseEntity register(@Valid @RequestBody User user) throws NotFoundException {
         userService.register(user);
         return ResponseEntity.ok().build();
     }

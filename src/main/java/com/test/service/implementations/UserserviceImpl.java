@@ -85,7 +85,10 @@ public class UserserviceImpl implements UserService {
     }
 
     @Transactional
-    public void register(User user) {
+    public void register(User user) throws NotFoundException{
+        if (getByEmail(user.getEmail()) != null){
+            throw new DuplicateException("Duplicated user data");
+        }
         helper.register(user);
         userRepository.save(user);
     }
@@ -149,10 +152,5 @@ public class UserserviceImpl implements UserService {
             }
         } else
             throw new InvalidParamException("confirm resetPasswordCode");
-    }
-
-    @Override
-    public void buyPainting() {
-
     }
 }
