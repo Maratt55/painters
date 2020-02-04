@@ -19,13 +19,15 @@ public interface UserService {
 
     void register(User user) throws NotFoundException;
 
-    void verify(String email, String verification);
+    void verify(String email, String verification) throws NotFoundException;
 
-    User login(String email, String password);
+    User login(String email, String password) throws NotFoundException;
 
-    void saveAuthority(User user);
+    void resetPassword(String email, String resetPasswordCode, String newPassword) throws NotFoundException;
 
-    void resetPassword(String email, String resetPasswordCode, String newPassword);
+    void endPoint(String email) throws NotFoundException;
 
-    void endPoint(String email);
+    User getByVerificationCode(String verificationCode);
+
+    User getByPasswordCode(String resetPasswordCode);
 }

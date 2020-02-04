@@ -6,8 +6,9 @@ import com.test.exceptions.InvalidParamException;
 import com.test.exceptions.NotFoundException;
 import com.test.model.User;
 import com.test.repository.UserRepository;
+import com.test.service.interfaces.EmailService;
 import com.test.service.interfaces.UserService;
-import com.test.util.Helper;
+import net.bytebuddy.utility.RandomString;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,18 +29,19 @@ public class UserserviceImpl implements UserService {
     public static final long CURRENTY_FOR_HOURS = 12 * 60 * 60 * 1000;
 
     @Autowired
-    private Helper helper;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder encoder;
 
+    @Autowired
+    private EmailService emailService;
+
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveUser(User user) throws NotFoundException {
-        User user1 = userRepository.getByEmail(user.getEmail());
+
+        User user1 = getByEmail(user.getEmail());
         if (user1 != null) {
             throw new DuplicateException("Duplicated user data");
         }
@@ -56,17 +58,6 @@ public class UserserviceImpl implements UserService {
 
     public void delete(int id) {
         userRepository.deleteById(id);
-    }
-
-
-    @Transactional
-    public void update(User user) {
-        User user1 = userRepository.getByEmail(user.getEmail());
-        user1.setEmail(user.getEmail());
-        user1.setPhone(user.getPhone());
-        user1.setName(user.getName());
-        user1.setWallet(user.getWallet());
-        userRepository.save(user1);
     }
 
     public User getByEmail(String email) throws NotFoundException {
@@ -94,31 +85,47 @@ public class UserserviceImpl implements UserService {
         if (user1 != null) {
             throw new DuplicateException("Duplicated user data");
         }
-        helper.register(user);
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setVerificationTime(System.currentTimeMillis());
+        user.setStatus(Status.UNVERIFIED);
+        setVerifyCode(user);
         userRepository.save(user);
     }
 
     @Transactional
-    public void verify(String email, String verification) {
-        User user = userRepository.getByEmail(email);
-        if (verification.equals(user.getVerification())) {
+    public void verify(String email, String verification) throws NotFoundException {
+        User user = getByEmail(email);
+        if (verification.equals(user.getVerificationCode())) {
             if ((System.currentTimeMillis() - user.getVerificationTime()) >= CURRENTY_FOR_HOURS) {
-                helper.resetVerification(user);
+                setVerifyCode(user);
                 userRepository.save(user);
             } else {
                 user.setStatus(Status.VERIFIED);
-                user.setVerification(null);
+                user.setVerificationCode(null);
                 userRepository.save(user);
             }
         } else
-            throw new InvalidParamException("confirm verification code");
+            throw new InvalidParamException("Verification code is false");
     }
 
-    public User login(String email, String password) {
-        User user = userRepository.getByEmail(email);
+    private User setVerifyCode(User user) {
+        RandomString randomString = new RandomString();
+        String verificationCode = randomString.nextString();
+        while (getByVerificationCode(verificationCode) != null) {
+            verificationCode = randomString.nextString();
+        }
+        user.setVerificationCode(verificationCode);
+        user.setVerificationTime(System.currentTimeMillis());
+        String text = ("Your verification code is: " + verificationCode);
+        emailService.sendSimpleMessage(user.getEmail(), "Please verify your email", text);
+        return user;
+    }
+
+    public User login(String email, String password) throws NotFoundException {
+        User user = getByEmail(email);
         if (encoder.matches(password, user.getPassword())) {
             if (user.getStatus() == Status.UNVERIFIED) {
-                throw new InvalidParamException("confirm verification code");
+                throw new InvalidParamException("Confirm verification code");
             }
             return user;
         } else
@@ -126,36 +133,53 @@ public class UserserviceImpl implements UserService {
     }
 
     @Transactional
-    public void saveAuthority(User user) {
-        User user1 = userRepository.getByEmail(user.getEmail());
-        user1.setAuthority(user.getAuthority());
-        userRepository.save(user1);
-    }
-
-    @Transactional
-    public void endPoint(String email) {
-        User user = userRepository.getByEmail(email);
-        helper.endPoint(user);
+    public void endPoint(String email) throws NotFoundException {
+        User user = getByEmail(email);
+        setPasswordCode(user);
+        user.setStatus(Status.UNVERIFIED);
         userRepository.save(user);
     }
 
+    private User setPasswordCode(User user) {
+        RandomString randomString = new RandomString();
+        String passwordCode = randomString.nextString();
+       /* while (getByPasswordCode(passwordCode) != null) {
+            passwordCode = randomString.nextString();
+        }*/
+        user.setResetPasswordCode(randomString.nextString());
+        user.setResetPasswordTime(System.currentTimeMillis());
+        String text = ("Your verification code is: " + passwordCode);
+        emailService.sendSimpleMessage(user.getEmail(), "Please verify your email", text);
+        return user;
+    }
+
     @Transactional
-    public void resetPassword(String email, String resetPasswordCode, String newPassword) {
-        User user = userRepository.getByEmail(email);
+    public void resetPassword(String email, String resetPasswordCode, String newPassword) throws NotFoundException {
+        User user = getByEmail(email);
         if (resetPasswordCode.equals(user.getResetPasswordCode())) {
             if ((System.currentTimeMillis() - user.getResetPasswordTime()) >= CURRENTY_FOR_HOURS) {
-                helper.resetPasswordCode(user);
+                setPasswordCode(user);
                 userRepository.save(user);
             } else {
                 user.setPassword(encoder.encode(newPassword));
                 user.setVerificationTime(System.currentTimeMillis());
                 user.setStatus(Status.VERIFIED);
-                user.setVerification(null);
+                user.setVerificationCode(null);
                 user.setResetPasswordCode(null);
-                user.setResetPasswordTime(0);
                 userRepository.save(user);
             }
         } else
             throw new InvalidParamException("confirm resetPasswordCode");
+    }
+
+    public User getByVerificationCode(String verificationCode) {
+        User user = userRepository.getByVerificationCode(verificationCode);
+        return user;
+    }
+
+    @Override
+    public User getByPasswordCode(String passwordCode) {
+        User user = userRepository.getByResetPasswordCode(passwordCode);
+        return user;
     }
 }

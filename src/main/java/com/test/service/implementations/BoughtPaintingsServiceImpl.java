@@ -43,7 +43,7 @@ public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
     @Autowired
     private CurrencyService currencyService;
 
-    @Value("${System.Wallet.Id}")
+    @Value("${system.wallet.id}")
     private int systemWalletId;
 
 

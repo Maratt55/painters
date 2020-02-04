@@ -1,10 +1,25 @@
 package com.test.model;
 
+import com.test.enums.Status;
+
 import javax.persistence.*;
 import java.util.List;
 
+
 @Entity
 public class User extends AbstractModel {
+
+    private long verificationTime;
+    private long resetPasswordTime;
+
+    @Column(unique = true)
+    private String verificationCode;
+
+    @Column(name = "resetPasswordCode", unique = true)
+    private String resetPasswordCode;
+
+    @Enumerated(EnumType.ORDINAL)
+    private Status status;
 
     @ManyToMany
     @JoinTable(name = "user_authority",
@@ -43,10 +58,55 @@ public class User extends AbstractModel {
         this.wallet = wallet;
     }
 
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public long getVerificationTime() {
+        return verificationTime;
+    }
+
+    public void setVerificationTime(long verificationTime) {
+        this.verificationTime = verificationTime;
+    }
+
+    public long getResetPasswordTime() {
+        return resetPasswordTime;
+    }
+
+    public void setResetPasswordTime(long resetPasswordTime) {
+        this.resetPasswordTime = resetPasswordTime;
+    }
+
+    public String getResetPasswordCode() {
+        return resetPasswordCode;
+    }
+
+    public void setResetPasswordCode(String resetPasswordCode) {
+        this.resetPasswordCode = resetPasswordCode;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "authority=" + authority +
+                "verificationCode='" + verificationCode + '\'' +
+                ", verificationTime=" + verificationTime +
+                ", resetPasswordTime=" + resetPasswordTime +
+                ", resetPasswordCode='" + resetPasswordCode + '\'' +
+                ", status=" + status +
+                ", authority=" + authority +
                 ", painter=" + painter +
                 ", wallet=" + wallet +
                 '}';

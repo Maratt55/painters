@@ -1,4 +1,4 @@
-package com.test.util;
+/*package com.test.util;
 
 import com.test.enums.Status;
 import com.test.model.AbstractModel;
@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class Helper {
-
     @Autowired
     private EmailService emailService;
 
@@ -30,15 +29,15 @@ public class Helper {
         abstractModel.setVerificationTime(System.currentTimeMillis());
         RandomString randomString = new RandomString();
         abstractModel.setVerification(randomString.nextString());
-       /* String text = ("Your verification code is: " + abstractModel.getVerification());
-        emailService.sendSimpleMessage(abstractModel.getEmail(), "Please verify your email", text);*/
+        String text = ("Your verification code is: " + abstractModel.getVerification());
+        emailService.sendSimpleMessage(abstractModel.getEmail(), "Please verify your email", text);
     }
 
     public void endPoint(AbstractModel abstractModel) {
-        new Helper().resetPasswordCode(abstractModel);
+        resetPasswordCode(abstractModel);
         abstractModel.setStatus(Status.UNVERIFIED);
         String text = ("Your verification code is: " + abstractModel.getResetPasswordCode());
-        emailService.sendSimpleMessage(abstractModel.getEmail(), "Please verify your email", text);
+        emailService.sendSimpleMessage(abstractModel.getEmail(), "Please verify your em", text);
     }
 
     public void resetPasswordCode(AbstractModel abstractModel) {
@@ -46,4 +45,4 @@ public class Helper {
         abstractModel.setResetPasswordCode(randomString.nextString());
         abstractModel.setResetPasswordTime(System.currentTimeMillis());
     }
-}
+}*/
