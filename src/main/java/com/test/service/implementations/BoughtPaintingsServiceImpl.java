@@ -110,7 +110,7 @@ public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
 
     private void systemWallet(BigDecimal money, int currencyId) {
         SystemWallet wallet = systemWalletService.getById(systemWalletId);
-        wallet.setBalance(money);
+        wallet.setBalance(wallet.getBalance().add(money));
         wallet.setCurrency(currencyService.getById(currencyId));
     }
 
@@ -122,10 +122,11 @@ public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
         Wallet userWallet = painting.getPainter().getUser().getWallet();
         BigDecimal paintingPrice = painting.getPrice();
         SystemWallet systemWallet = systemWalletService.getById(systemWalletId);
-        BigDecimal money = paintingPrice.multiply(new BigDecimal(0.10), MathContext.DECIMAL32);
-        BigDecimal bd = systemWallet.getBalance().subtract(money);
-        userWallet.setBalance(userWallet.getBalance().add(bd));
-        systemWallet.setBalance(money);
+        BigDecimal profit = paintingPrice.multiply(new BigDecimal(0.10), MathContext.DECIMAL32);
+        BigDecimal havingMoney = systemWallet.getBalance();
+        BigDecimal userMoney =paintingPrice.subtract(boughtPaintings.getPrice()).subtract(profit);
+        userWallet.setBalance(userWallet.getBalance().add(userMoney));
+        systemWallet.setBalance(havingMoney.add(profit));
 
         boughtPaintings.setStatus(BoughtStatus.FINISHED);
         boughtPaintings.setDate(new Date());
