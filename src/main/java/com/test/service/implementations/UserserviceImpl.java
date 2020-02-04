@@ -8,6 +8,7 @@ import com.test.model.User;
 import com.test.repository.UserRepository;
 import com.test.service.interfaces.UserService;
 import com.test.util.Helper;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Service
 public class UserserviceImpl implements UserService {
+
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(UserserviceImpl.class);
 
     public static final long CURRENTY_FOR_HOURS = 12 * 60 * 60 * 1000;
 
@@ -34,7 +38,7 @@ public class UserserviceImpl implements UserService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveUser(User user) {
+    public void saveUser(User user) throws NotFoundException {
         User user1 = userRepository.getByEmail(user.getEmail());
         if (user1 != null) {
             throw new DuplicateException("Duplicated user data");
@@ -65,7 +69,7 @@ public class UserserviceImpl implements UserService {
         userRepository.save(user1);
     }
 
-    public User getByEmail(String email) throws NotFoundException{
+    public User getByEmail(String email) throws NotFoundException {
         User user = userRepository.getByEmail(email);
         if (user == null) {
             throw new NotFoundException("User is not found");
@@ -85,8 +89,9 @@ public class UserserviceImpl implements UserService {
     }
 
     @Transactional
-    public void register(User user) throws NotFoundException{
-        if (getByEmail(user.getEmail()) != null){
+    public void register(User user) throws NotFoundException {
+        User user1 = getByEmail(user.getEmail());
+        if (user1 != null) {
             throw new DuplicateException("Duplicated user data");
         }
         helper.register(user);

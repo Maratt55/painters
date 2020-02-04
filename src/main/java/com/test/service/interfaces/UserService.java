@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-    void saveUser(User user);
+    void saveUser(User user) throws NotFoundException;
 
     User getById(int id) throws NotFoundException;
 

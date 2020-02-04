@@ -13,11 +13,11 @@ public interface PainterService {
 
     void update(Painter painter) throws NotFoundException;
 
-    Painter getByEmail(String email);
+    Painter getByEmail(String email) throws NotFoundException;
 
     List<Painter> getAll();
 
-    void register(AbstractModel abstractModel) throws NotFoundException;
+    void register(Painter painter) throws NotFoundException;
 
     void verify(String email, String verification) throws NotFoundException;
 

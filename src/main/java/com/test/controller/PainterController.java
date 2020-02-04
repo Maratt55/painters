@@ -36,7 +36,7 @@ public class PainterController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity getByEmail(@RequestParam(value = "email") String email) {
+    public ResponseEntity getByEmail(@RequestParam(value = "email") String email) throws NotFoundException {
         Painter painter = painterService.getByEmail(email);
         return ResponseEntity.ok(painter);
     }

@@ -21,7 +21,7 @@ public class UserController {
     private UserService userService;
 
     @PutMapping("/save")
-    public ResponseEntity save(@Valid @RequestBody User user) {
+    public ResponseEntity save(@Valid @RequestBody User user) throws NotFoundException {
         userService.saveUser(user);
         return ResponseEntity.ok().build();
     }

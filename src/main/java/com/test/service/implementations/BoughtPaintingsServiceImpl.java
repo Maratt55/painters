@@ -7,6 +7,7 @@ import com.test.model.*;
 import com.test.repository.BoughtPaintingsRepository;
 import com.test.service.interfaces.*;
 import net.bytebuddy.utility.RandomString;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +23,7 @@ import java.util.Date;
 public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
 
 
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(BoughtPaintingsServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(BoughtPaintingsServiceImpl.class);
 
     @Autowired
     private UserService userService;

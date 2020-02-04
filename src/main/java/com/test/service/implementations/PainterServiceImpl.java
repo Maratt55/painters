@@ -7,10 +7,14 @@ import com.test.exceptions.NotFoundException;
 import com.test.model.AbstractModel;
 import com.test.model.Painter;
 import com.test.model.User;
+import com.test.model.Wallet;
 import com.test.repository.PainterRepository;
 import com.test.service.interfaces.PainterService;
 import com.test.service.interfaces.UserService;
+import com.test.service.interfaces.WalletService;
 import com.test.util.Helper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,8 @@ import java.util.List;
 public class PainterServiceImpl implements PainterService {
 
 
+    private final Logger logger = LoggerFactory.getLogger(BoughtPaintingsServiceImpl.class);
+
     public static final long CURRENTY_FOR_HOURS = 12 * 60 * 60 * 1000;
 
     @Autowired
@@ -38,6 +44,9 @@ public class PainterServiceImpl implements PainterService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private WalletService walletService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -57,8 +66,12 @@ public class PainterServiceImpl implements PainterService {
         painterRepository.save(painter1);
     }
 
-    public Painter getByEmail(String email) {
-        return painterRepository.getByEmail(email);
+    public Painter getByEmail(String email) throws NotFoundException {
+        Painter painter = painterRepository.getByEmail(email);
+        if (painter == null){
+            throw new NotFoundException("Painter is not found");
+        }
+        return painter;
     }
 
     public List<Painter> getAll() {
@@ -70,42 +83,33 @@ public class PainterServiceImpl implements PainterService {
     }
 
     @Transactional
-    public void register(AbstractModel abstractModel) throws NotFoundException {
-        int phone = abstractModel.getPhone();
-        String email = abstractModel.getEmail();
-        String password = abstractModel.getPassword();
-        String name = abstractModel.getName();
+    public void register(Painter painter) throws NotFoundException, DuplicateException {
 
-        User user1 = userService.getByEmail(email);
-        User user = new User();
+        User user1 = null;
+        String email = painter.getEmail();
+        Painter painter1 = null;
+
+        try {
+            user1 = userService.getByEmail(email);
+        } catch (NotFoundException e) {
+            logger.info("User is not found");
+        }
+        User user = painter.getUser();
         if (user1 == null) {
-            user.setPassword(password);
-            user.setEmail(email);
-            user.setPhone(phone);
-            user.setName(name);
             helper.register(user);
             userService.saveUser(user);
-        } else {
-            Painter painter = new Painter();
-            painter.setPhone(user1.getPhone());
-            painter.setName(user1.getName());
-            painter.setPassword(user1.getPassword());
-            painter.setEmail(user1.getEmail());
-            painter.setUser(user1);
-            helper.register(painter);
-            painterRepository.save(painter);
-            return;
         }
-        Painter painter1 = painterRepository.getByEmail(email);
+        try {
+            painter1 = getByEmail(email);
+        }catch (NotFoundException e){
+            logger.info("Painter is not found");
+        }
+        if (user1 != null){
+            painter.setUser(user1);
+        }
         if (painter1 != null) {
             throw new DuplicateException("Duplicated painter data");
         }
-        Painter painter = new Painter();
-        painter.setPhone(phone);
-        painter.setName(name);
-        painter.setPassword(password);
-        painter.setEmail(email);
-        painter.setUser(user);
         helper.register(painter);
         painterRepository.save(painter);
     }

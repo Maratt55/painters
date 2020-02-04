@@ -11,7 +11,7 @@ public class Painter extends AbstractModel {
     @JoinColumn(name = "painter_fk")
     private List<Painting> paintings;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_fk")
     private User user;
 
