@@ -85,14 +85,13 @@ public class PainterServiceImpl implements PainterService {
         User user = painter.getUser();
         if (user1 == null) {
             userService.register(user);
+        } else {
+            painter.setUser(user1);
         }
         try {
             painter1 = getByEmail(email);
         } catch (NotFoundException e) {
             logger.info("Painter is not found");
-        }
-        if (user1 != null) {
-            painter.setUser(user1);
         }
         if (painter1 != null) {
             throw new DuplicateException("Duplicated painter data");
