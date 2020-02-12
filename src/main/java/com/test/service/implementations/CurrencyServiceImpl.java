@@ -45,11 +45,7 @@ public class CurrencyServiceImpl implements CurrencyService {
             File file = new File(getClass().getClassLoader().getResource("currency.xml").getFile());
             CurrencyArray currencyArray = (CurrencyArray) jaxbUnmarshaller.unmarshal(file);
             List<Currency> list = currencyArray.getCurrencies();
-            ArrayList<Currency> arrayList = new ArrayList<>();
-            for (Currency currency : list) {
-                arrayList.add(currency);
-            }
-            currencyRepository.saveAll(arrayList);
+            currencyRepository.saveAll(list);
         } catch (JAXBException e) {
             logger.info("Could not unmarshalling");
         }
