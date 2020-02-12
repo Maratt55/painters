@@ -135,10 +135,10 @@ public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
 
     @Override
     public BoughtPaintings getById(int boughtPaintingsId) throws NotFoundException {
-        BoughtPaintings boughtPaintings = boughtPaintingsRepository.getById(boughtPaintingsId);
-        if (boughtPaintings == null) {
-            throw new NotFoundException("BoughtPaintings not found");
+        BoughtPaintings boughtPainting = boughtPaintingsRepository.getById(boughtPaintingsId);
+        if (boughtPainting == null) {
+            throw new NotFoundException("BoughtPainting is not found");
         }
-        return boughtPaintings;
+        return boughtPainting;
     }
 }

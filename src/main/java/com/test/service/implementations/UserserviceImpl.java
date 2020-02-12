@@ -81,7 +81,12 @@ public class UserserviceImpl implements UserService {
 
     @Transactional
     public void register(User user) throws NotFoundException {
-        User user1 = getByEmail(user.getEmail());
+        User user1 = null;
+        try {
+            user1 = getByEmail(user.getEmail());
+        } catch (NotFoundException e) {
+            logger.info("User is not found");
+        }
         if (user1 != null) {
             throw new DuplicateException("Duplicated user data");
         }
@@ -99,6 +104,7 @@ public class UserserviceImpl implements UserService {
             if ((System.currentTimeMillis() - user.getVerificationTime()) >= CURRENTY_FOR_HOURS) {
                 setVerifyCode(user);
                 userRepository.save(user);
+                logger.info("Your verification code expired");
             } else {
                 user.setStatus(Status.VERIFIED);
                 user.setVerificationCode(null);
@@ -129,7 +135,7 @@ public class UserserviceImpl implements UserService {
             }
             return user;
         } else
-            throw new InvalidParamException("incorrect email or password");
+            throw new InvalidParamException("Incorrect email or password");
     }
 
     @Transactional
@@ -159,17 +165,17 @@ public class UserserviceImpl implements UserService {
         if (resetPasswordCode.equals(user.getResetPasswordCode())) {
             if ((System.currentTimeMillis() - user.getResetPasswordTime()) >= CURRENTY_FOR_HOURS) {
                 setPasswordCode(user);
-                userRepository.save(user);
             } else {
                 user.setPassword(encoder.encode(newPassword));
                 user.setVerificationTime(System.currentTimeMillis());
                 user.setStatus(Status.VERIFIED);
                 user.setVerificationCode(null);
                 user.setResetPasswordCode(null);
-                userRepository.save(user);
+                return;
             }
-        } else
+        } else {
             throw new InvalidParamException("confirm resetPasswordCode");
+        }
     }
 
     public User getByVerificationCode(String verificationCode) {
