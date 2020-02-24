@@ -1,5 +1,6 @@
 package com.test.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.test.model.xml.Currency;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ public class Wallet {
 
     @OneToOne
     @JoinColumn(name = "user_fk", unique = true)
+    @JsonBackReference
     private User user;
 
 

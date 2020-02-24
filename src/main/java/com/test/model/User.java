@@ -33,6 +33,7 @@ public class User extends AbstractModel {
     private Painter painter;
 
     @OneToOne(mappedBy = "user")
+    @JsonManagedReference
     private Wallet wallet;
 
 
