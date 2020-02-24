@@ -45,9 +45,9 @@ public class PaintingServiceImpl implements PaintingService {
         return painting;
     }
 
-    public void save(Painting painting){
+    /*public void save(Painting painting){
         paintingRepository.save(painting);
-    }
+    }*/
 
     @Transactional
     public void uploadFile(MultipartFile file, int painterId, BigDecimal price) {
@@ -63,15 +63,16 @@ public class PaintingServiceImpl implements PaintingService {
             List<Painting> list = painter.getPaintings();
             list.add(painting);
             painter.setPaintings(list);
+            painting.setPainter(painter);
+            paintingRepository.save(painting);
             painterService.update(painter);
         } catch (IOException e) {
             logger.info("file upload error");
         } catch (NotFoundException e) {
-            logger.info("not found");
+            logger.info("Painter is not found");
         }
     }
 
-    @Override
     public Painting getByConfirmCode(String confirmCode) {
         return paintingRepository.getByConfirmCode(confirmCode);
     }

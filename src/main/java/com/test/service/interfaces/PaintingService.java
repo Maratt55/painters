@@ -15,5 +15,5 @@ public interface PaintingService {
 
     Painting getByConfirmCode(String confirmCode);
 
-    void save(Painting painting);
+    //void save(Painting painting);
 }

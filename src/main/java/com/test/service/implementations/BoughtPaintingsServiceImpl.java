@@ -115,9 +115,12 @@ public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
     }
 
     @Transactional
-    public void paintingReceived(int boughtPaintingsId) throws NotFoundException {
+    public void paintingReceived(int boughtPaintingsId) throws NotFoundException, AccessDeniedException {
 
         BoughtPaintings boughtPaintings = getById(boughtPaintingsId);
+        if (boughtPaintings.getStatus().equals(BoughtStatus.FINISHED)){
+            throw new AccessDeniedException("Purchase completed");
+        }
         Painting painting = boughtPaintings.getPainting();
         Wallet userWallet = painting.getPainter().getUser().getWallet();
         BigDecimal paintingPrice = painting.getPrice();
@@ -126,14 +129,13 @@ public class BoughtPaintingsServiceImpl implements BoughtPaintingsService {
         BigDecimal havingMoney = systemWallet.getBalance();
         BigDecimal userMoney =paintingPrice.subtract(boughtPaintings.getPrice()).subtract(profit);
         userWallet.setBalance(userWallet.getBalance().add(userMoney));
-        systemWallet.setBalance(havingMoney.add(profit));
+        systemWallet.setBalance(havingMoney.subtract(painting.getPrice()).add(boughtPaintings.getPrice()).add(profit));
 
         boughtPaintings.setStatus(BoughtStatus.FINISHED);
         boughtPaintings.setDate(new Date());
         boughtPaintings.setPrice(painting.getPrice());
     }
 
-    @Override
     public BoughtPaintings getById(int boughtPaintingsId) throws NotFoundException {
         BoughtPaintings boughtPainting = boughtPaintingsRepository.getById(boughtPaintingsId);
         if (boughtPainting == null) {

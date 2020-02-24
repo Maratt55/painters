@@ -1,8 +1,14 @@
 package com.test.model;
 
 
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
+
+
 
 @Entity
 public class Painting {
@@ -22,6 +28,7 @@ public class Painting {
 
     @ManyToOne
     @JoinColumn(name = "painter_fk")
+    @JsonBackReference
     private Painter painter;
 
 

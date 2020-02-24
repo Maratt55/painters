@@ -1,5 +1,6 @@
 package com.test.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.test.enums.Status;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class User extends AbstractModel {
     private List<Authority> authority;
 
     @OneToOne(mappedBy = "user")
+    @JsonManagedReference
     private Painter painter;
 
     @OneToOne(mappedBy = "user")

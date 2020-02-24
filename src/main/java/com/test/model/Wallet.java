@@ -4,7 +4,8 @@ import com.test.model.xml.Currency;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Objects;
+
+
 
 @Entity
 public class Wallet {
