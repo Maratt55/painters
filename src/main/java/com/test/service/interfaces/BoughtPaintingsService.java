@@ -13,7 +13,7 @@ public interface BoughtPaintingsService {
 
     void check(int paintingId, String email) throws NotFoundException;
 
-    void paintingReceived(int boughtPaintingsId) throws NotFoundException;
+    void paintingReceived(int boughtPaintingsId) throws NotFoundException, AccessDeniedException;
 
     BoughtPaintings getById(int boughtPaintingsId) throws NotFoundException;
 }

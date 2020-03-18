@@ -19,7 +19,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @Service
@@ -55,12 +57,9 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Transactional
     public List<Currency> getAll(Pageable pageable) {
         String[] sort = pageable.getSort().toString().split(":");
-        String s = "";
-        for (String s1 : sort) {
-            s += s1;
-        }
-        String hql = "from Currency order by " + s;
-        Query query = entityManager.createQuery(hql);
+        String hql = "from Currency order by ";
+        String s = Arrays.stream(sort).reduce(String.valueOf(" "), (s1, s2) -> s1 + s2);
+        Query query = entityManager.createQuery(hql + s);
         int size = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         query.setFirstResult(pageNumber * size);

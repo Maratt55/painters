@@ -47,7 +47,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity getAll() {
         Sort sort = Sort.by("name");
-        Pageable pageable = PageRequest.of(0, 2, sort);
+        Pageable pageable = PageRequest.of(0, 1, sort);
         Page<User> page = userService.getAll(pageable);
         return ResponseEntity.ok(page);
     }

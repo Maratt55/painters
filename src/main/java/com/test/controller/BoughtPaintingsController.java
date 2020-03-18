@@ -29,7 +29,7 @@ public class BoughtPaintingsController {
 
     @PostMapping("/wallet")
     //@RolesAllowed(value = "ADMIN")
-    public ResponseEntity paintingReceived(@RequestParam(value = "boughtPaintingsId") int boughtPaintingsId) throws NotFoundException {
+    public ResponseEntity paintingReceived(@RequestParam(value = "boughtPaintingsId") int boughtPaintingsId) throws NotFoundException, AccessDeniedException {
         boughtPaintingsService.paintingReceived(boughtPaintingsId);
         return ResponseEntity.ok().build();
     }
